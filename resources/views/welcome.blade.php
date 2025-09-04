@@ -136,7 +136,7 @@
                         </div>
                     </div>
 
-                    <div class="note note-ok">✓ Kondisi sangat baik untuk menjemur pakaian</div>
+                    <div class="note note-ok">✓ Kondisi sangat baik untuk menjemur pakaian.</div>
                 </div>
             </article>
 
