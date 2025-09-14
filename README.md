@@ -15,12 +15,13 @@ Smart Clothesline is an innovative IoT-enabled web application that revolutioniz
 - ⚡ **Automation Rules**: Intelligent drying optimization and scheduling
 - 📊 **Analytics & Statistics**: Weekly usage patterns and performance insights
 - 🔔 **Smart Notifications**: Alerts for optimal drying conditions
+- 🔐 **User Authentication**: Secure login and registration system
 
 ### Technical Features
 - ⚡ **Laravel 12**: Robust backend with modern PHP 8.2+ features
-- 🎨 **Tailwind CSS 4.0**: Utility-first responsive design
+- 🎨 **Tailwind CSS 4.0**: Utility-first responsive design with local compilation
 - 📱 **Mobile-First**: Optimized for all device sizes
-- 🛡️ **Secure Authentication**: Laravel's built-in security features
+- 🛡️ **Secure Authentication**: Custom authentication controllers with CSRF protection
 - 🚀 **High Performance**: Server-side rendering with optimized caching
 - 🔧 **Developer-Friendly**: PSR-12 standards with comprehensive testing
 
@@ -68,7 +69,7 @@ Smart Clothesline is an innovative IoT-enabled web application that revolutioniz
 
 ### 1. Clone & Setup
 ```bash
-git clone <repository-url>
+git clone https://github.com/maliks1/Smart-Clothesline
 cd Smart-Clothesline
 ```
 
@@ -184,12 +185,17 @@ php artisan about
 Smart-Clothesline/
 ├── app/                    # Application logic
 │   ├── Http/Controllers/   # Controllers
+│   │   └── Auth/           # Authentication controllers
 │   ├── Models/            # Eloquent models
 │   └── Providers/         # Service providers
 ├── config/                # Configuration files
 ├── database/              # Migrations, seeders, factories
 ├── public/                # Public assets
 ├── resources/             # Views, CSS, JS
+│   ├── css/               # Tailwind CSS configuration
+│   ├── js/                # JavaScript files
+│   └── views/             # Blade templates
+│       └── auth/          # Authentication views
 ├── routes/                # Route definitions
 ├── tests/                 # Test files
 └── storage/               # Logs, cache, uploads

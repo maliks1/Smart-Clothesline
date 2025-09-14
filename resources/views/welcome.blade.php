@@ -1,491 +1,102 @@
 <!DOCTYPE html>
-<html lang="id">
-
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Smart Clothesline – Dashboard</title>
-    <link rel="stylesheet" href="{{ asset('app.css') }}" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Clothesline</title>
+    <link rel="stylesheet" href="{{ asset('app.css') }}">
+    @vite('resources/css/app.css')
 </head>
-
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="brand">
-            <div class="logo">SC</div>
-            <div>
-                <h1>Smart Clothesline</h1>
-                <p>Sistem Jemuran Pintar</p>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold text-indigo-600">Smart Clothesline System</h1>
             </div>
-        </div>
-        <div class="header-actions">
-            <div class="online">
-                <span class="dot"></span>
-                <span>Terhubung</span>
-            </div>
-            <button class="icon-btn" aria-label="Notifikasi">🔔</button>
-            <button class="icon-btn" aria-label="Pengaturan">⚙️</button>
-        </div>
-    </header>
-
-    <main class="container">
-        <section class="intro mb-10">
-            <h2>Dashboard Smart Clothesline</h2>
-            <p>Kelola sistem jemuran pintar Anda dengan mudah dan efisien</p>
-        </section>
-
-        <!-- Top grid: Cuaca, Efisiensi, Kontrol Cepat -->
-        <section class="grid grid-3 mb">
-
-            <!-- MAP Card -->
-            <article class="card">
-                <div class="card-header">
-                    <h3>Peta Lokasi</h3>
-                    <span class="badge badge-eco">📍 Live Position</span>
-                </div>
-                <div class="card-content space">
-                    <div id="map" style="height: 300px; border-radius: 12px; overflow: hidden;"></div>
-                    <p class="muted small mt">
-                        🗺️ Peta ini menampilkan posisi jemuran pintar Anda secara real-time menggunakan layanan OpenStreetMap.
-                        Pastikan izin lokasi diaktifkan agar posisi dapat terdeteksi dengan tepat.
-                    </p>
-                </div>
-            </article>
-
-            <!-- Tambahkan Leaflet CSS & JS -->
-            <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-            <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-            <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    // Inisialisasi peta
-                    const map = L.map('map').setView([-6.914744, 107.609810], 13); // default Bandung
-
-                    // Tambahkan tile layer dari OSM
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '© OpenStreetMap contributors'
-                    }).addTo(map);
-
-                    // Marker default
-                    const marker = L.marker([-6.914744, 107.609810]).addTo(map)
-                        .bindPopup("Lokasi awal (Bandung)").openPopup();
-
-                    // Update sesuai lokasi user
-                    if ("geolocation" in navigator) {
-                        navigator.geolocation.getCurrentPosition(
-                            (pos) => {
-                                const {
-                                    latitude,
-                                    longitude
-                                } = pos.coords;
-                                map.setView([latitude, longitude], 15);
-                                marker.setLatLng([latitude, longitude])
-                                    .bindPopup("📍 Lokasi Anda").openPopup();
-                            },
-                            () => {
-                                console.warn("Izin lokasi ditolak, gunakan default Bandung");
-                            }
-                        );
-                    }
-                });
-            </script>
-
-            <!-- Weather Card -->
-            <article class="card">
-                <div class="card-header">
-                    <h3>Kondisi Cuaca</h3>
-                    <span class="badge badge-ok">Optimal</span>
-                </div>
-                <div class="card-content space">
-                    <!-- Lokasi -->
-                    <div class="flex items-center gap-2 muted text-sm mb-2">
-                        <span class="text-lg">📍</span>
-                        <span id="weather-location">Bandung, Indonesia</span>
-                    </div>
-
-                    <div class="weather-icon" aria-hidden="true">☀️</div>
-
-                    <div class="stats grid-2">
-                        <div class="stat">
-                            <div class="stat-icon">🌡️</div>
-                            <div>
-                                <p class="muted">Suhu</p>
-                                <p class="value">28°C</p>
-                            </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-icon">💧</div>
-                            <div>
-                                <p class="muted">Kelembaban</p>
-                                <p class="value">65%</p>
-                            </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-icon">🌬️</div>
-                            <div>
-                                <p class="muted">Angin</p>
-                                <p class="value">12 km/h</p>
-                            </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-icon">🌧️</div>
-                            <div>
-                                <p class="muted">Hujan</p>
-                                <p class="value">0%</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="note note-ok">✓ Kondisi sangat baik untuk menjemur pakaian.</div>
-                </div>
-            </article>
-
-            <!-- Quick Actions -->
-            <article class="card">
-                <div class="card-header">
-                    <h3>Kontrol Cepat</h3>
-                </div>
-                <div class="card-content">
-                    <div class="grid grid-2 gap">
-                        <button id="btn-on" class="btn btn-outline action">
-                            <span class="ico">⏻</span>
-                            <span>Nyalakan Semua</span>
-                        </button>
-
-                        <button id="btn-reset" class="btn btn-outline action">
-                            <span class="ico">↺</span>
-                            <span>Reset Semua</span>
-                        </button>
-
-                        <button id="btn-bentang" class="btn btn-outline action">
-                            <span class="ico">⬌</span>
-                            <span>Bentangkan</span>
-                        </button>
-
-                        <button id="btn-lipat" class="btn btn-outline action">
-                            <span class="ico">⬍</span>
-                            <span>Lipat/Tarik</span>
-                        </button>
-
-                        <button id="mode-day" class="btn btn-outline action"><span class="ico">🌞</span><span>Mode Siang</span></button>
-                        <button id="mode-night" class="btn btn-outline action"><span class="ico">🌙</span><span>Mode Malam</span></button>
-                    </div>
-                    <div class="note note-warn mt">
-                        💡 Tip: Gunakan mode otomatis untuk efisiensi terbaik
-                    </div>
-                </div>
-            </article>
-
-            <!-- Script toggle -->
-            <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    const body = document.body;
-                    const dayBtn = document.getElementById("mode-day");
-                    const nightBtn = document.getElementById("mode-night");
-
-                    dayBtn.addEventListener("click", () => {
-                        body.classList.remove("dark-mode");
-                    });
-
-                    nightBtn.addEventListener("click", () => {
-                        body.classList.add("dark-mode");
-                    });
-                });
-            </script>
-        </section>
-
-        <!-- Middle row -->
-        <section class="grid grid-3 mb">
-            <!-- Clothesline Status -->
-            <article class="card grid-span-2">
-                <div class="card-header">
-                    <h3>Status Jemuran</h3>
-                </div>
-                <div class="card-content">
-                    <div class="grid grid-3 gap">
-                        <div class="tile">
-                            <div class="tile-title">Posisi Rel</div>
-                            <div class="tile-value" id="rel-value">Terbuka 82%</div>
-                            <div class="progress"><span id="rel-progress" style="width:82%"></span></div>
-                        </div>
-                        <div class="tile">
-                            <div class="tile-title">Sensor Hujan</div>
-                            <div class="tile-value ok">Kering</div>
-                            <p class="muted small">Tidak ada tetesan terdeteksi</p>
-                        </div>
-                        <div class="tile">
-                            <div class="tile-title">Siklus</div>
-                            <div class="tile-value">28 selesai</div>
-                            <p class="muted small">Minggu ini</p>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Catatan -->
-            <article class="card">
-                <div class="card-header">
-                    <h3>Catatan</h3>
-                </div>
-                <div class="card-content">
-                    <textarea id="notes" placeholder="Tulis catatan di sini..."
-                        class="w-full p-3 border rounded-md mb-3 text-sm leading-normal tile-value"
-                        rows="6"></textarea>
-                    <button id="save-notes"
-                        class="btn btn-outline w-full tile">
-                        💾 Simpan Catatan
-                    </button>
-                </div>
-            </article>
-        </section>
-
-        <!-- Settings -->
-        <section class="grid grid-3">
-            <!-- Smart Settings -->
-            <article class="card grid-span-2">
-                <div class="card-header">
-                    <h3>Pengaturan Pintar</h3>
-                </div>
-                <div class="card-content">
-                    <div class="grid grid-2 gap">
-                        <div>
-                            <h4 class="section-sub">📱 Notifikasi</h4>
-                            <div class="list">
-                                <label class="switch-row">
-                                    <span>Peringatan Cuaca</span>
-                                    <input type="checkbox" class="switch-input" checked>
-                                    <span class="slider"></span>
-                                </label>
-                                <label class="switch-row">
-                                    <span>Notifikasi Selesai</span>
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                                <label class="switch-row">
-                                    <span>Peringatan Hujan</span>
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 class="section-sub">⏱️ Pengaturan Timer</h4>
-                            <div class="form-group">
-                                <label for="jenis-kain">Jenis Kain Default</label>
-                                <div class="select">
-                                    <select id="jenis-kain">
-                                        <option>Pilih jenis kain</option>
-                                        <option>Katun (2-3 jam)</option>
-                                        <option>Polyester (1-2 jam)</option>
-                                        <option>Denim (3-4 jam)</option>
-                                        <option>Sutra (30-45 menit)</option>
-                                    </select>
+        </header>
+        
+        <main class="flex-grow">
+            <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                <div class="px-4 py-6 sm:px-0">
+                    <div class="text-center">
+                        <h1 class="text-4xl font-extrabold text-gray-900 mb-6">Welcome to Smart Clothesline</h1>
+                        <p class="text-xl text-gray-600 mb-10">Intelligent clothesline management with weather integration</p>
+                        
+                        @auth
+                            <div class="bg-white shadow overflow-hidden sm:rounded-lg max-w-3xl mx-auto mb-10">
+                                <div class="px-4 py-5 sm:p-6">
+                                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Welcome back, {{ Auth::user()->name }}!</h2>
+                                    <p class="text-gray-600 mb-6">You're already signed in to your account.</p>
+                                    <div class="flex justify-center">
+                                        <a href="{{ route('dashboard') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            Go to Dashboard
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="mode">Mode Pengeringan</label>
-                                <div class="select">
-                                    <select id="mode">
-                                        <option>Pilih mode</option>
-                                        <option>Normal</option>
-                                        <option>Eco (Hemat Energi)</option>
-                                        <option>Cepat</option>
-                                        <option>Lembut</option>
-                                    </select>
+                        @else
+                            <div class="bg-white shadow overflow-hidden sm:rounded-lg max-w-3xl mx-auto">
+                                <div class="px-4 py-5 sm:p-6">
+                                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Get Started</h2>
+                                    <p class="text-gray-600 mb-8">Sign in to your account or create a new one to access your smart clothesline dashboard.</p>
+                                    
+                                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                                        <a href="{{ route('login') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            Sign In
+                                        </a>
+                                        <a href="{{ route('register') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            Create Account
+                                        </a>
+                                    </div>
                                 </div>
+                            </div>
+                        @endauth
+                        
+                        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <div class="text-indigo-600 mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Weather Integration</h3>
+                                <p class="text-gray-600">Automatic clothesline control based on real-time weather data</p>
+                            </div>
+                            
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <div class="text-indigo-600 mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Smart Analytics</h3>
+                                <p class="text-gray-600">Track usage patterns and optimize drying efficiency</p>
+                            </div>
+                            
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <div class="text-indigo-600 mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Smart Notifications</h3>
+                                <p class="text-gray-600">Receive alerts for optimal drying conditions and system status</p>
                             </div>
                         </div>
                     </div>
-
-                    <div class="divider"></div>
-
-                    <h4 class="section-sub">🛡️ Keamanan & Privasi</h4>
-                    <div class="grid grid-2 gap">
-                        <label class="switch-row">
-                            <span>Tarik Otomatis saat Hujan</span>
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                        <label class="switch-row">
-                            <span>Mode Malam Otomatis</span>
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
                 </div>
-            </article>
-
-            <!-- Sidebar statistics -->
-            <article class="card">
-                <div class="card-header">
-                    <h3>Statistik Mingguan</h3>
-                </div>
-                <div class="card-content list">
-                    <div class="row"><span class="muted">Total Waktu Aktif</span><strong>42h 15m</strong></div>
-                    <div class="row"><span class="muted">Siklus Selesai</span><strong>28 siklus</strong></div>
-                    <div class="row"><span class="muted">Efisiensi Rata-rata</span><strong class="ok">91%</strong></div>
-                    <div class="row"><span class="muted">Penghematan Bulanan</span><strong class="ok">Rp 186.000</strong></div>
-                </div>
-            </article>
-        </section>
-
-        <footer class="footer">
-            Smart Clothesline System v2.1 • Hemat energi, ramah lingkungan
+            </div>
+        </main>
+        
+        <footer class="bg-white mt-12">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <p class="text-center text-gray-500 text-sm">
+                    &copy; 2025 Smart Clothesline System. All rights reserved.
+                </p>
+            </div>
         </footer>
-    </main>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const btnOn = document.getElementById("btn-on");
-            const btnReset = document.getElementById("btn-reset");
-            const btnBentang = document.getElementById("btn-bentang");
-            const btnLipat = document.getElementById("btn-lipat");
-
-            const relValue = document.getElementById("rel-value");
-            const relProgress = document.getElementById("rel-progress");
-            const switches = document.querySelectorAll(".switch-input");
-
-            // Fungsi nyalakan semua
-            btnOn.addEventListener("click", () => {
-                switches.forEach(sw => sw.checked = true);
-                relValue.textContent = "Terbuka 100%";
-                relProgress.style.width = "100%";
-                alert("✅ Semua fungsi dinyalakan");
-            });
-
-            // Fungsi reset semua
-            btnReset.addEventListener("click", () => {
-                switches.forEach(sw => sw.checked = false);
-                relValue.textContent = "Tertutup 0%";
-                relProgress.style.width = "0%";
-                alert("🔄 Semua fungsi direset");
-            });
-
-            // Fungsi bentangkan (set ke 100%)
-            btnBentang.addEventListener("click", () => {
-                relValue.textContent = "Terbuka 100%";
-                relProgress.style.width = "100%";
-                alert("⬌ Jemuran dibentangkan");
-            });
-
-            // Fungsi lipat/tarik (set ke 0%)
-            btnLipat.addEventListener("click", () => {
-                relValue.textContent = "Tertutup 0%";
-                relProgress.style.width = "0%";
-                alert("⬍ Jemuran ditarik / dilipat");
-            });
-
-            // ===== Catatan =====
-            const notesArea = document.getElementById("notes");
-            const saveBtn = document.getElementById("save-notes");
-
-            if (localStorage.getItem("dashboardNotes")) {
-                notesArea.value = localStorage.getItem("dashboardNotes");
-            }
-
-            saveBtn.addEventListener("click", () => {
-                localStorage.setItem("dashboardNotes", notesArea.value);
-                alert("📝 Catatan berhasil disimpan!");
-            });
-
-            // ===== Lokasi + Cuaca =====
-            const locationSpan = document.getElementById("weather-location");
-            const tempEl = document.querySelectorAll(".stat .value")[0]; // suhu
-            const humidityEl = document.querySelectorAll(".stat .value")[1]; // kelembaban
-            const windEl = document.querySelectorAll(".stat .value")[2]; // angin
-            const rainEl = document.querySelectorAll(".stat .value")[3]; // hujan
-            const weatherIcon = document.querySelector(".weather-icon");
-
-            const API_KEY = "YOUR_API_KEY"; // ganti dengan API key OpenWeather
-
-            async function updateWeather(lat, lon) {
-                try {
-                    // Lokasi text
-                    const resLoc = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-                    );
-                    const dataLoc = await resLoc.json();
-                    const city = dataLoc.address.city ||
-                        dataLoc.address.town ||
-                        dataLoc.address.village ||
-                        dataLoc.address.county ||
-                        "Lokasi tidak diketahui";
-                    const country = dataLoc.address.country || "";
-                    locationSpan.textContent = `${city}, ${country}`;
-
-                    // Cuaca real-time
-                    const resWeather = await fetch(
-                        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=id`
-                    );
-                    const dataWeather = await resWeather.json();
-
-                    tempEl.textContent = `${Math.round(dataWeather.main.temp)}°C`;
-                    humidityEl.textContent = `${dataWeather.main.humidity}%`;
-                    windEl.textContent = `${dataWeather.wind.speed} m/s`;
-                    rainEl.textContent = dataWeather.rain ? `${dataWeather.rain["1h"]} mm` : "0%";
-
-                    const condition = dataWeather.weather[0].main.toLowerCase();
-                    if (condition.includes("cloud")) {
-                        weatherIcon.textContent = "☁️";
-                    } else if (condition.includes("rain")) {
-                        weatherIcon.textContent = "🌧️";
-                    } else if (condition.includes("clear")) {
-                        weatherIcon.textContent = "☀️";
-                    } else if (condition.includes("snow")) {
-                        weatherIcon.textContent = "❄️";
-                    } else {
-                        weatherIcon.textContent = "🌤️";
-                    }
-                } catch (err) {
-                    locationSpan.textContent = "Gagal memuat cuaca";
-                }
-            }
-
-            if (locationSpan) {
-                locationSpan.textContent = "Mendeteksi lokasi...";
-
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => {
-                            const {
-                                latitude,
-                                longitude
-                            } = pos.coords;
-                            updateWeather(latitude, longitude);
-                            // refresh tiap 10 menit
-                            setInterval(() => updateWeather(latitude, longitude), 600000);
-                        },
-                        () => {
-                            locationSpan.textContent = "Izin lokasi ditolak";
-                        }
-                    );
-                } else {
-                    locationSpan.textContent = "Browser tidak mendukung geolokasi";
-                }
-            }
-
-            // ===== Mode malam otomatis =====
-            const body = document.body;
-            const autoNightSwitch = document.querySelector(
-                'label.switch-row:has(span:contains("Mode Malam Otomatis")) input'
-            );
-
-            function checkAutoNight() {
-                if (autoNightSwitch && autoNightSwitch.checked) {
-                    const hour = new Date().getHours();
-                    if (hour >= 18 || hour < 6) {
-                        body.classList.add("dark-mode"); // malam
-                    } else {
-                        body.classList.remove("dark-mode"); // siang
-                    }
-                }
-            }
-
-            checkAutoNight();
-            setInterval(checkAutoNight, 300000); // cek ulang tiap 5 menit
-        });
-    </script>
-
+    </div>
+    
+    @vite('resources/js/app.js')
 </body>
-
 </html>
