@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,7 +8,7 @@
     <title>Smart Clothesline | Dashboard</title>
     <link rel="stylesheet" href="{{ asset('app.css') }}">
     @vite('resources/css/app.css')
-    
+
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -20,7 +21,7 @@
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-xl font-bold text-indigo-600">Smart Clothesline</h1>
+                        <h1 class="text-xl font-bold text-indigo-600">Dashboard Smart Clothesline</h1>
                     </div>
                 </div>
                 <div class="flex items-center">
@@ -30,7 +31,7 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="text-sm text-indigo-600 hover:text-indigo-900">
-                                    Sign out
+                                    Logout
                                 </button>
                             </form>
                         </div>
@@ -40,44 +41,13 @@
         </div>
     </nav>
 
-    <!-- Header -->
-    <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-        </div>
-    </header>
-
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div class="px-4 py-6 sm:px-0">
-            <!-- Welcome Message -->
-            <div class="bg-white shadow rounded-lg p-6 mb-8">
-                <h2 class="text-2xl font-semibold mb-4">Welcome to your Smart Clothesline Dashboard</h2>
-                <p class="text-gray-600">You are successfully logged in as {{ Auth::user()->email }}</p>
-                
-                <div class="mt-8">
-                    <h3 class="text-xl font-medium mb-4">System Status</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
-                            <h4 class="font-medium text-lg mb-2">Clothesline Status</h4>
-                            <p class="text-green-500 font-semibold">Operational</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
-                            <h4 class="font-medium text-lg mb-2">Weather Conditions</h4>
-                            <p class="text-blue-500 font-semibold">Sunny</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
-                            <h4 class="font-medium text-lg mb-2">Next Scheduled Task</h4>
-                            <p class="text-purple-500 font-semibold">Retract in 2 hours</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Dashboard Content -->
             <div class="container mx-auto">
                 <section class="intro mb-10">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Smart Clothesline</h2>
                     <p class="text-gray-600">Kelola sistem jemuran pintar Anda dengan mudah dan efisien</p>
                 </section>
 
@@ -87,7 +57,8 @@
                     <article class="bg-white rounded-lg shadow border border-gray-200">
                         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 class="text-lg font-semibold">Peta Lokasi</h3>
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">📍 Live Position</span>
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">📍
+                                Live Position</span>
                         </div>
                         <div class="p-6 space-y-4">
                             <div id="map" style="height: 300px; border-radius: 12px; overflow: hidden;"></div>
@@ -103,48 +74,53 @@
                     <article class="bg-white rounded-lg shadow border border-gray-200">
                         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 class="text-lg font-semibold">Kondisi Cuaca</h3>
-                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Optimal</span>
+                            <span
+                                class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Optimal</span>
                         </div>
                         <div class="p-6 space-y-6">
                             <!-- Lokasi -->
                             <div class="flex items-center gap-2 text-gray-500 text-sm">
                                 <span class="text-lg">📍</span>
-                                <span id="weather-location">Bandung, Indonesia</span>
+                                <span id="weather-location">Memuat...</span>
                             </div>
 
-                            <div class="text-5xl text-center text-yellow-500" aria-hidden="true">☀️</div>
+                            <div class="text-5xl text-center">
+                                <img id="weather-icon" alt="" class="inline-block w-16 h-16" />
+                            </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="flex items-center gap-3">
                                     <div class="text-2xl">🌡️</div>
                                     <div>
                                         <p class="text-gray-500 text-sm">Suhu</p>
-                                        <p class="font-bold text-lg">28°C</p>
+                                        <p class="font-bold text-lg"><span id="weather-temp">—</span>°C</p>
+                                        <p class="text-xs text-gray-500">Min <span id="weather-min">—</span>° / Max
+                                            <span id="weather-max">—</span>°
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <div class="text-2xl">💧</div>
                                     <div>
                                         <p class="text-gray-500 text-sm">Kelembaban</p>
-                                        <p class="font-bold text-lg">65%</p>
+                                        <p class="font-bold text-lg"><span id="weather-hum">—</span>%</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <div class="text-2xl">🌬️</div>
                                     <div>
                                         <p class="text-gray-500 text-sm">Angin</p>
-                                        <p class="font-bold text-lg">12 km/h</p>
+                                        <p class="font-bold text-lg"><span id="weather-wind">—</span> km/h</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <div class="text-2xl">🌧️</div>
                                     <div>
-                                        <p class="text-gray-500 text-sm">Hujan</p>
-                                        <p class="font-bold text-lg">0%</p>
+                                        <p class="text-gray-500 text-sm">Peluang Hujan (hari ini)</p>
+                                        <p class="font-bold text-lg"><span id="weather-pop">—</span>%</p>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-green-800 text-sm">
                                 ✓ Kondisi sangat baik untuk menjemur pakaian.
                             </div>
@@ -158,36 +134,43 @@
                         </div>
                         <div class="p-6">
                             <div class="grid grid-cols-2 gap-4">
-                                <button id="btn-on" class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
+                                <button id="btn-on"
+                                    class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
                                     <span class="text-2xl mb-2">⏻</span>
                                     <span class="text-sm">Nyalakan Semua</span>
                                 </button>
 
-                                <button id="btn-reset" class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
+                                <button id="btn-reset"
+                                    class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
                                     <span class="text-2xl mb-2">↺</span>
                                     <span class="text-sm">Reset Semua</span>
                                 </button>
 
-                                <button id="btn-bentang" class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
+                                <button id="btn-bentang"
+                                    class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
                                     <span class="text-2xl mb-2">⬌</span>
                                     <span class="text-sm">Bentangkan</span>
                                 </button>
 
-                                <button id="btn-lipat" class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
+                                <button id="btn-lipat"
+                                    class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
                                     <span class="text-2xl mb-2">⬍</span>
                                     <span class="text-sm">Lipat/Tarik</span>
                                 </button>
 
-                                <button id="mode-day" class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
+                                <button id="mode-day"
+                                    class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
                                     <span class="text-2xl mb-2">🌞</span>
                                     <span class="text-sm">Mode Siang</span>
                                 </button>
-                                <button id="mode-night" class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
+                                <button id="mode-night"
+                                    class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50">
                                     <span class="text-2xl mb-2">🌙</span>
                                     <span class="text-sm">Mode Malam</span>
                                 </button>
                             </div>
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-yellow-800 text-sm mt-4">
+                            <div
+                                class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-yellow-800 text-sm mt-4">
                                 💡 Tip: Gunakan mode otomatis untuk efisiensi terbaik
                             </div>
                         </div>
@@ -207,7 +190,8 @@
                                     <div class="text-gray-500 text-sm mb-1">Posisi Rel</div>
                                     <div class="font-bold text-lg mb-2" id="rel-value">Terbuka 82%</div>
                                     <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div id="rel-progress" class="bg-blue-600 h-2 rounded-full" style="width:82%"></div>
+                                        <div id="rel-progress" class="bg-blue-600 h-2 rounded-full" style="width:82%">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="border border-gray-200 rounded-lg p-4">
@@ -231,8 +215,10 @@
                         </div>
                         <div class="p-6">
                             <textarea id="notes" placeholder="Tulis catatan di sini..."
-                                class="w-full p-3 border border-gray-300 rounded-md mb-3 text-sm leading-normal" rows="6"></textarea>
-                            <button id="save-notes" class="w-full border border-gray-300 rounded-lg p-3 text-center hover:bg-gray-50">
+                                class="w-full p-3 border border-gray-300 rounded-md mb-3 text-sm leading-normal"
+                                rows="6"></textarea>
+                            <button id="save-notes"
+                                class="w-full border border-gray-300 rounded-lg p-3 text-center hover:bg-gray-50">
                                 💾 Simpan Catatan
                             </button>
                         </div>
@@ -253,15 +239,21 @@
                                     <div class="space-y-3">
                                         <label class="flex items-center justify-between">
                                             <span>Peringatan Cuaca</span>
-                                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                            <input type="checkbox"
+                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                checked>
                                         </label>
                                         <label class="flex items-center justify-between">
                                             <span>Notifikasi Selesai</span>
-                                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                            <input type="checkbox"
+                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                checked>
                                         </label>
                                         <label class="flex items-center justify-between">
                                             <span>Peringatan Hujan</span>
-                                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                            <input type="checkbox"
+                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                checked>
                                         </label>
                                     </div>
                                 </div>
@@ -299,11 +291,13 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <label class="flex items-center justify-between">
                                     <span>Tarik Otomatis saat Hujan</span>
-                                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                    <input type="checkbox"
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
                                 </label>
                                 <label class="flex items-center justify-between">
                                     <span>Mode Malam Otomatis</span>
-                                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                                    <input type="checkbox"
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
                                 </label>
                             </div>
                         </div>
@@ -343,9 +337,9 @@
             </div>
         </div>
     </main>
-    
+
     @vite('resources/js/app.js')
-    
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const btnOn = document.getElementById("btn-on");
@@ -399,67 +393,6 @@
                 localStorage.setItem("dashboardNotes", notesArea.value);
                 alert("📝 Catatan berhasil disimpan!");
             });
-
-            // ===== Lokasi + Cuaca =====
-            const locationSpan = document.getElementById("weather-location");
-            const tempEl = document.querySelectorAll(".stat .value")[0]; // suhu
-            const humidityEl = document.querySelectorAll(".stat .value")[1]; // kelembaban
-            const windEl = document.querySelectorAll(".stat .value")[2]; // angin
-            const rainEl = document.querySelectorAll(".stat .value")[3]; // hujan
-            const weatherIcon = document.querySelector(".weather-icon");
-
-            const API_KEY = "YOUR_API_KEY"; // ganti dengan API key OpenWeather
-
-            async function updateWeather(lat, lon) {
-                try {
-                    // Lokasi text
-                    const resLoc = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-                    );
-                    const dataLoc = await resLoc.json();
-                    const city = dataLoc.address.city ||
-                        dataLoc.address.town ||
-                        dataLoc.address.village ||
-                        dataLoc.address.county ||
-                        "Lokasi tidak diketahui";
-                    const country = dataLoc.address.country || "";
-                    locationSpan.textContent = `${city}, ${country}`;
-
-                    // Cuaca real-time
-                    const resWeather = await fetch(
-                        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=id`
-                    );
-                    const dataWeather = await resWeather.json();
-
-                    // Update UI elements with weather data
-                    // (This would need to be adapted based on actual DOM structure)
-                } catch (err) {
-                    locationSpan.textContent = "Gagal memuat cuaca";
-                }
-            }
-
-            if (locationSpan) {
-                locationSpan.textContent = "Mendeteksi lokasi...";
-
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => {
-                            const {
-                                latitude,
-                                longitude
-                            } = pos.coords;
-                            // updateWeather(latitude, longitude);
-                            // refresh tiap 10 menit
-                            // setInterval(() => updateWeather(latitude, longitude), 600000);
-                        },
-                        () => {
-                            locationSpan.textContent = "Izin lokasi ditolak";
-                        }
-                    );
-                } else {
-                    locationSpan.textContent = "Browser tidak mendukung geolokasi";
-                }
-            }
 
             // ===== Mode malam otomatis =====
             const body = document.body;
@@ -517,4 +450,5 @@
         });
     </script>
 </body>
+
 </html>
