@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const city = "Jakarta";
+    const city = "Bandung";
     const url = `/weather/${city}`;
 
     fetch(url)
@@ -12,8 +12,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
             document.getElementById("weather-location").textContent = data.name;
             document.getElementById("weather-temp").textContent = data.main.temp;
-            document.getElementById("weather-min").textContent = data.main.temp_min;
-            document.getElementById("weather-max").textContent = data.main.temp_max;
             document.getElementById("weather-hum").textContent = data.main.humidity;
             document.getElementById("weather-wind").textContent = data.wind.speed;
             document.getElementById("weather-icon").src =

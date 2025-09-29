@@ -16,7 +16,7 @@
 
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow">
+    <nav class="bg-white shadow top-0 left-0 right-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex">
@@ -42,15 +42,11 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 mt-16">
         <div class="px-4 py-6 sm:px-0">
 
             <!-- Dashboard Content -->
             <div class="container mx-auto">
-                <section class="intro mb-10">
-                    <p class="text-gray-600">Kelola sistem jemuran pintar Anda dengan mudah dan efisien</p>
-                </section>
-
                 <!-- Top grid: Cuaca, Efisiensi, Kontrol Cepat -->
                 <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <!-- MAP Card -->
@@ -61,7 +57,8 @@
                                 Live Position</span>
                         </div>
                         <div class="p-6 space-y-4">
-                            <div id="map" style="height: 300px; border-radius: 12px; overflow: hidden;"></div>
+                            <div id="map"
+                                style="height: 300px; border-radius: 12px; overflow: hidden; margin-top: 1rem;"></div>
                             <p class="text-gray-500 text-sm">
                                 🗺️ Peta ini menampilkan posisi jemuran pintar Anda secara real-time menggunakan layanan
                                 OpenStreetMap.
@@ -94,9 +91,6 @@
                                     <div>
                                         <p class="text-gray-500 text-sm">Suhu</p>
                                         <p class="font-bold text-lg"><span id="weather-temp">—</span>°C</p>
-                                        <p class="text-xs text-gray-500">Min <span id="weather-min">—</span>° / Max
-                                            <span id="weather-max">—</span>°
-                                        </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
@@ -188,9 +182,9 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div class="border border-gray-200 rounded-lg p-4">
                                     <div class="text-gray-500 text-sm mb-1">Posisi Rel</div>
-                                    <div class="font-bold text-lg mb-2" id="rel-value">Terbuka 82%</div>
+                                    <div class="font-bold text-lg mb-2" id="rel-value">Terbuka 100%</div>
                                     <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div id="rel-progress" class="bg-blue-600 h-2 rounded-full" style="width:82%">
+                                        <div id="rel-progress" class="bg-blue-600 h-2 rounded-full" style="width:100%">
                                         </div>
                                     </div>
                                 </div>
@@ -201,104 +195,9 @@
                                 </div>
                                 <div class="border border-gray-200 rounded-lg p-4">
                                     <div class="text-gray-500 text-sm mb-1">Siklus</div>
-                                    <div class="font-bold text-lg mb-1">28 selesai</div>
-                                    <p class="text-gray-500 text-sm">Minggu ini</p>
+                                    <div class="font-bold text-lg mb-1">1 selesai</div>
+                                    <p class="text-gray-500 text-sm">hari ini</p>
                                 </div>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Catatan -->
-                    <article class="bg-white rounded-lg shadow border border-gray-200">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold">Catatan</h3>
-                        </div>
-                        <div class="p-6">
-                            <textarea id="notes" placeholder="Tulis catatan di sini..."
-                                class="w-full p-3 border border-gray-300 rounded-md mb-3 text-sm leading-normal"
-                                rows="6"></textarea>
-                            <button id="save-notes"
-                                class="w-full border border-gray-300 rounded-lg p-3 text-center hover:bg-gray-50">
-                                💾 Simpan Catatan
-                            </button>
-                        </div>
-                    </article>
-                </section>
-
-                <!-- Settings -->
-                <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Smart Settings -->
-                    <article class="bg-white rounded-lg shadow border border-gray-200 lg:col-span-2">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold">Pengaturan Pintar</h3>
-                        </div>
-                        <div class="p-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <h4 class="font-medium text-gray-900 mb-3">📱 Notifikasi</h4>
-                                    <div class="space-y-3">
-                                        <label class="flex items-center justify-between">
-                                            <span>Peringatan Cuaca</span>
-                                            <input type="checkbox"
-                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                checked>
-                                        </label>
-                                        <label class="flex items-center justify-between">
-                                            <span>Notifikasi Selesai</span>
-                                            <input type="checkbox"
-                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                checked>
-                                        </label>
-                                        <label class="flex items-center justify-between">
-                                            <span>Peringatan Hujan</span>
-                                            <input type="checkbox"
-                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                checked>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h4 class="font-medium text-gray-900 mb-3">⏱️ Pengaturan Timer</h4>
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="block text-sm text-gray-700 mb-1">Jenis Kain Default</label>
-                                            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
-                                                <option>Pilih jenis kain</option>
-                                                <option>Katun (2-3 jam)</option>
-                                                <option>Polyester (1-2 jam)</option>
-                                                <option>Denim (3-4 jam)</option>
-                                                <option>Sutra (30-45 menit)</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm text-gray-700 mb-1">Mode Pengeringan</label>
-                                            <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
-                                                <option>Pilih mode</option>
-                                                <option>Normal</option>
-                                                <option>Eco (Hemat Energi)</option>
-                                                <option>Cepat</option>
-                                                <option>Lembut</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="border-t border-gray-200 my-6"></div>
-
-                            <h4 class="font-medium text-gray-900 mb-3">🛡️ Keamanan & Privasi</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <label class="flex items-center justify-between">
-                                    <span>Tarik Otomatis saat Hujan</span>
-                                    <input type="checkbox"
-                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
-                                </label>
-                                <label class="flex items-center justify-between">
-                                    <span>Mode Malam Otomatis</span>
-                                    <input type="checkbox"
-                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
-                                </label>
                             </div>
                         </div>
                     </article>
@@ -312,19 +211,15 @@
                             <div class="space-y-4">
                                 <div class="flex justify-between">
                                     <span class="text-gray-500">Total Waktu Aktif</span>
-                                    <strong>42h 15m</strong>
+                                    <strong>32h 10m</strong>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-500">Siklus Selesai</span>
-                                    <strong>28 siklus</strong>
+                                    <strong>8 siklus</strong>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-500">Efisiensi Rata-rata</span>
                                     <strong class="text-green-500">91%</strong>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Penghematan Bulanan</span>
-                                    <strong class="text-green-500">Rp 186.000</strong>
                                 </div>
                             </div>
                         </div>
@@ -332,7 +227,7 @@
                 </section>
 
                 <footer class="text-center text-gray-500 text-sm mt-12 py-6">
-                    Smart Clothesline System v2.1 • Hemat energi, ramah lingkungan
+                    Smart Clothesline System v1.0 • Hemat energi, ramah lingkungan
                 </footer>
             </div>
         </div>
