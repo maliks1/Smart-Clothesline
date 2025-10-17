@@ -240,7 +240,8 @@
             });
 
             // Initialize MQTT client with a slight delay to ensure page is fully loaded
-            setTimeout(initMqttClient, 1000);
+            // Pass btnBentang to the MQTT client initialization
+            setTimeout(() => initMqttClient(btnBentang), 1000);
 
             // Inisialisasi peta
             const map = L.map('map').setView([-6.914744, 107.609810], 13); // default Bandung
@@ -273,7 +274,7 @@
             }
         });
 
-        function initMqttClient() {
+        function initMqttClient(btnBentang) {
             // Get MQTT status elements
             const mqttStatusText = document.getElementById('mqtt-status');
             const mqttStatusDescription = document.getElementById('mqtt-status-description');
@@ -375,12 +376,26 @@
                             rainSensorText.classList.add('text-red-500');
                             rainSensorDescription.textContent = 'Terdeteksi tetesan air';
                             console.log('Rain sensor updated to: Basah');
+                            
+                            // Disable the bentangkan button when it's raining
+                            if (btnBentang) {
+                                btnBentang.disabled = true;
+                                btnBentang.classList.add('opacity-50', 'cursor-not-allowed');
+                                console.log('Bentangkan button disabled due to rain');
+                            }
                         } else if (data === 'cerah') {
                             rainSensorText.textContent = 'Kering';
                             rainSensorText.classList.remove('text-red-500');
                             rainSensorText.classList.add('text-green-500');
                             rainSensorDescription.textContent = 'Tidak ada tetesan terdeteksi';
                             console.log('Rain sensor updated to: Kering');
+                            
+                            // Enable the bentangkan button when it's clear
+                            if (btnBentang) {
+                                btnBentang.disabled = false;
+                                btnBentang.classList.remove('opacity-50', 'cursor-not-allowed');
+                                console.log('Bentangkan button enabled');
+                            }
                         }
                     } else {
                         console.error('Could not find rain sensor elements');
@@ -444,7 +459,7 @@
                 
                 // Attempt to reconnect after 5 seconds
                 setTimeout(() => {
-                    initMqttClient();
+                    initMqttClient(btnBentang);
                 }, 5000);
             });
 
