@@ -337,6 +337,23 @@
                         }
                     }
                 });
+                
+                // Subscribe to jemuran/status topic
+                client.subscribe('jemuran/status', function(err) {
+                    if (!err) {
+                        console.log('Subscribed to jemuran/status topic');
+                    } else {
+                        console.error('Failed to subscribe to jemuran/status topic', err);
+                        if (mqttStatusText) {
+                            mqttStatusText.textContent = 'Error Langganan';
+                            mqttStatusText.classList.remove('text-green-500', 'text-yellow-500');
+                            mqttStatusText.classList.add('text-red-500');
+                        }
+                        if (mqttStatusDescription) {
+                            mqttStatusDescription.textContent = 'Gagal berlangganan topik status';
+                        }
+                    }
+                });
             });
 
             client.on('message', function(topic, message) {
@@ -367,6 +384,35 @@
                         }
                     } else {
                         console.error('Could not find rain sensor elements');
+                    }
+                } else if (topic === 'jemuran/status') {
+                    const data = message.toString();
+                    console.log('Processing status data:', data);
+                    
+                    // Update the rail position display based on simple string values
+                    const relValue = document.getElementById('rel-value');
+                    const relProgress = document.getElementById('rel-progress');
+                    
+                    if (relValue && relProgress) {
+                        if (data === 'terbuka') {
+                            relValue.textContent = 'Terbuka 100%';
+                            relProgress.style.width = '100%';
+                            console.log('Rail position updated to: Terbuka');
+                        } else if (data === 'tertutup') {
+                            relValue.textContent = 'Tertutup 0%';
+                            relProgress.style.width = '0%';
+                            console.log('Rail position updated to: Tertutup');
+                        } else if (data.startsWith('terbuka:')) {
+                            // Handle partial opening like "terbuka:50"
+                            const percentage = data.split(':')[1];
+                            if (!isNaN(percentage)) {
+                                relValue.textContent = `Terbuka ${percentage}%`;
+                                relProgress.style.width = `${percentage}%`;
+                                console.log(`Rail position updated to: Terbuka ${percentage}%`);
+                            }
+                        }
+                    } else {
+                        console.error('Could not find rail position elements');
                     }
                 }
             });
