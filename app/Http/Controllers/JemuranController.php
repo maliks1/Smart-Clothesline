@@ -4,20 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use PhpMqtt\Client\Facades\MQTT;
+use Exception;
 
 class JemuranController extends Controller
 {
     public function buka()
     {
-        $mqtt = MQTT::connection();
-        $mqtt->publish('jemuran/servo/command', '0'); // buka
-        return back()->with('status', 'Jemuran dibentangkan');
+        try {
+            $mqtt = MQTT::connection();
+            $mqtt->publish('jemuran/servo/command', '0'); // buka
+            return back()->with('status', 'Jemuran dibentangkan');
+        } catch (Exception $e) {
+            return back()->withErrors(['mqtt' => 'Gagal mengirim perintah ke server MQTT: ' . $e->getMessage()]);
+        }
     }
 
     public function tutup()
     {
-        $mqtt = MQTT::connection();
-        $mqtt->publish('jemuran/servo/command', '1'); // tutup
-        return back()->with('status', 'Jemuran ditutup');
+        try {
+            $mqtt = MQTT::connection();
+            $mqtt->publish('jemuran/servo/command', '1'); // tutup
+            return back()->with('status', 'Jemuran ditutup');
+        } catch (Exception $e) {
+            return back()->withErrors(['mqtt' => 'Gagal mengirim perintah ke server MQTT: ' . $e->getMessage()]);
+        }
     }
 }

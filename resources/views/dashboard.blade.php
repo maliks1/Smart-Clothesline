@@ -174,13 +174,13 @@
                             </div>
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="text-gray-500 text-sm mb-1">Sensor Hujan</div>
-                                <div class="font-bold text-green-500 text-lg mb-1">Kering</div>
-                                <p class="text-gray-500 text-sm">Tidak ada tetesan terdeteksi</p>
+                                <div id="rain-sensor-status" class="font-bold text-green-500 text-lg mb-1">Kering</div>
+                                <p id="rain-sensor-description" class="text-gray-500 text-sm">Tidak ada tetesan terdeteksi</p>
                             </div>
                             <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="text-gray-500 text-sm mb-1">Siklus</div>
-                                <div class="font-bold text-lg mb-1">1 selesai</div>
-                                <p class="text-gray-500 text-sm">hari ini</p>
+                                <div class="text-gray-500 text-sm mb-1">Status Koneksi MQTT</div>
+                                <div id="mqtt-status" class="font-bold text-yellow-500 text-lg mb-1">Menghubungkan...</div>
+                                <p id="mqtt-status-description" class="text-gray-500 text-sm">Mencoba terhubung ke broker</p>
                             </div>
                         </div>
                     </div>
@@ -195,8 +195,12 @@
 
     @vite('resources/js/app.js')
 
+    <!-- MQTT Client Library -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Existing control button functionality
             const btnBentang = document.getElementById("btn-bentang");
             const btnLipat = document.getElementById("btn-lipat");
             const relValue = document.getElementById("rel-value");
@@ -234,10 +238,10 @@
                 relProgress.style.width = "0%";
                 sendCommand("{{ route('jemuran.tutup') }}");
             });
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
+
+            // Initialize MQTT client with a slight delay to ensure page is fully loaded
+            setTimeout(initMqttClient, 1000);
+
             // Inisialisasi peta
             const map = L.map('map').setView([-6.914744, 107.609810], 13); // default Bandung
 
@@ -268,6 +272,163 @@
                 );
             }
         });
+
+        function initMqttClient() {
+            // Get MQTT status elements
+            const mqttStatusText = document.getElementById('mqtt-status');
+            const mqttStatusDescription = document.getElementById('mqtt-status-description');
+            
+            // Update status to connecting
+            if (mqttStatusText) {
+                mqttStatusText.textContent = 'Menghubungkan...';
+                mqttStatusText.classList.remove('text-green-500', 'text-red-500');
+                mqttStatusText.classList.add('text-yellow-500');
+            }
+            if (mqttStatusDescription) {
+                mqttStatusDescription.textContent = 'Mencoba terhubung ke broker';
+            }
+            
+            // MQTT connection options
+            const options = {
+                username: 'broker',
+                password: 'Testing123',
+                clientId: 'webClient-' + Math.random().toString(16).substr(2, 8),
+                protocol: 'wss', // Use WebSocket Secure for web clients
+                protocolVersion: 4,
+                clean: true,
+                reconnectPeriod: 1000,
+                connectTimeout: 30 * 1000,
+                will: {
+                    topic: 'WillMsg',
+                    payload: 'Connection Closed abnormally..!',
+                    qos: 0,
+                    retain: false
+                },
+            };
+
+            // Connect to MQTT broker
+            const client = mqtt.connect('wss://8aadf3c349f147a5876378e644e14867.s1.eu.hivemq.cloud:8884/mqtt', options);
+
+            client.on('connect', function() {
+                console.log('Connected to MQTT broker');
+                // Update connection status to connected
+                if (mqttStatusText) {
+                    mqttStatusText.textContent = 'Terhubung';
+                    mqttStatusText.classList.remove('text-yellow-500', 'text-red-500');
+                    mqttStatusText.classList.add('text-green-500');
+                }
+                if (mqttStatusDescription) {
+                    mqttStatusDescription.textContent = 'Terhubung ke broker MQTT';
+                }
+                
+                // Subscribe to jemuran/cuaca topic
+                client.subscribe('jemuran/cuaca', function(err) {
+                    if (!err) {
+                        console.log('Subscribed to jemuran/cuaca topic');
+                    } else {
+                        console.error('Failed to subscribe to jemuran/cuaca topic', err);
+                        if (mqttStatusText) {
+                            mqttStatusText.textContent = 'Error Langganan';
+                            mqttStatusText.classList.remove('text-green-500', 'text-yellow-500');
+                            mqttStatusText.classList.add('text-red-500');
+                        }
+                        if (mqttStatusDescription) {
+                            mqttStatusDescription.textContent = 'Gagal berlangganan topik cuaca';
+                        }
+                    }
+                });
+            });
+
+            client.on('message', function(topic, message) {
+                // Handle incoming messages
+                console.log('MQTT message received - Topic:', topic, 'Message:', message.toString());
+                
+                if (topic === 'jemuran/cuaca') {
+                    const data = message.toString();
+                    console.log('Processing weather data:', data);
+                    
+                    // Update the rain sensor display based on simple string values
+                    const rainSensorText = document.getElementById('rain-sensor-status');
+                    const rainSensorDescription = document.getElementById('rain-sensor-description');
+                    
+                    if (rainSensorText && rainSensorDescription) {
+                        if (data === 'hujan') {
+                            rainSensorText.textContent = 'Basah';
+                            rainSensorText.classList.remove('text-green-500');
+                            rainSensorText.classList.add('text-red-500');
+                            rainSensorDescription.textContent = 'Terdeteksi tetesan air';
+                            console.log('Rain sensor updated to: Basah');
+                        } else if (data === 'cerah') {
+                            rainSensorText.textContent = 'Kering';
+                            rainSensorText.classList.remove('text-red-500');
+                            rainSensorText.classList.add('text-green-500');
+                            rainSensorDescription.textContent = 'Tidak ada tetesan terdeteksi';
+                            console.log('Rain sensor updated to: Kering');
+                        }
+                    } else {
+                        console.error('Could not find rain sensor elements');
+                    }
+                }
+            });
+
+            client.on('error', function(err) {
+                console.error('MQTT connection error:', err);
+                // Update connection status to error
+                if (mqttStatusText) {
+                    mqttStatusText.textContent = 'Koneksi Gagal';
+                    mqttStatusText.classList.remove('text-green-500', 'text-yellow-500');
+                    mqttStatusText.classList.add('text-red-500');
+                }
+                if (mqttStatusDescription) {
+                    mqttStatusDescription.textContent = 'Gagal terhubung ke broker';
+                }
+            });
+
+            client.on('close', function() {
+                console.log('MQTT connection closed. Attempting to reconnect...');
+                // Update connection status to reconnecting
+                if (mqttStatusText) {
+                    mqttStatusText.textContent = 'Menghubungkan Ulang...';
+                    mqttStatusText.classList.remove('text-green-500', 'text-red-500');
+                    mqttStatusText.classList.add('text-yellow-500');
+                }
+                if (mqttStatusDescription) {
+                    mqttStatusDescription.textContent = 'Koneksi terputus. Mencoba menghubungkan ulang...';
+                }
+                
+                // Attempt to reconnect after 5 seconds
+                setTimeout(() => {
+                    initMqttClient();
+                }, 5000);
+            });
+
+            // Handle offline/online events
+            client.on('offline', function() {
+                console.log('MQTT client is offline');
+                // Update connection status to offline
+                if (mqttStatusText) {
+                    mqttStatusText.textContent = 'Offline';
+                    mqttStatusText.classList.remove('text-green-500', 'text-yellow-500');
+                    mqttStatusText.classList.add('text-red-500');
+                }
+                if (mqttStatusDescription) {
+                    mqttStatusDescription.textContent = 'Klien MQTT sedang offline';
+                }
+            });
+
+            client.on('reconnect', function() {
+                console.log('MQTT client is attempting to reconnect');
+                // Update connection status to reconnecting
+                if (mqttStatusText) {
+                    mqttStatusText.textContent = 'Menghubungkan Ulang...';
+                    mqttStatusText.classList.remove('text-green-500', 'text-red-500');
+                    mqttStatusText.classList.add('text-yellow-500');
+                }
+                if (mqttStatusDescription) {
+                    mqttStatusDescription.textContent = 'Mencoba menghubungkan ulang ke broker';
+                }
+            });
+        }
     </script>
 </body>
 
