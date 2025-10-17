@@ -199,82 +199,21 @@
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <script>
+        // MQTT client initialization
+        let client;
+        
         document.addEventListener("DOMContentLoaded", () => {
-            // Existing control button functionality
-            const btnBentang = document.getElementById("btn-bentang");
-            const btnLipat = document.getElementById("btn-lipat");
-            const relValue = document.getElementById("rel-value");
-            const relProgress = document.getElementById("rel-progress");
-
-            // Fungsi bentangkan (set ke 100%)
-            // Fungsi helper POST
-            function sendCommand(url) {
-                fetch(url, {
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({})
-                }).then(res => {
-                    if (!res.ok) throw new Error("Gagal kirim command");
-                    return res.text();
-                }).then(() => {
-                    console.log("Command terkirim ke " + url);
-                }).catch(err => {
-                    console.error(err);
-                    alert("Gagal kirim perintah ke server!");
-                });
-            }
-
-            btnBentang.addEventListener("click", () => {
-                relValue.textContent = "Terbuka 100%";
-                relProgress.style.width = "100%";
-                sendCommand("{{ route('jemuran.buka') }}");
-            });
-
-            btnLipat.addEventListener("click", () => {
-                relValue.textContent = "Tertutup 0%";
-                relProgress.style.width = "0%";
-                sendCommand("{{ route('jemuran.tutup') }}");
-            });
-
-            // Initialize MQTT client with a slight delay to ensure page is fully loaded
-            // Pass btnBentang to the MQTT client initialization
-            setTimeout(() => initMqttClient(btnBentang), 1000);
-
-            // Inisialisasi peta
-            const map = L.map('map').setView([-6.914744, 107.609810], 13); // default Bandung
-
-            // Tambahkan tile layer dari OSM
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            // Marker default
-            const marker = L.marker([-6.914744, 107.609810]).addTo(map)
-                .bindPopup("Lokasi awal (Bandung)").openPopup();
-
-            // Update sesuai lokasi user
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        const {
-                            latitude,
-                            longitude
-                        } = pos.coords;
-                        map.setView([latitude, longitude], 15);
-                        marker.setLatLng([latitude, longitude])
-                            .bindPopup("📍 Lokasi Anda").openPopup();
-                    },
-                    () => {
-                        console.warn("Izin lokasi ditolak, gunakan default Bandung");
-                    }
-                );
-            }
+            // Initialize MQTT client
+            initMqttClient();
+            
+            // Initialize control buttons
+            initControlButtons();
+            
+            // Initialize map
+            initMap();
         });
 
-        function initMqttClient(btnBentang) {
+        function initMqttClient() {
             // Get MQTT status elements
             const mqttStatusText = document.getElementById('mqtt-status');
             const mqttStatusDescription = document.getElementById('mqtt-status-description');
@@ -289,7 +228,7 @@
                 mqttStatusDescription.textContent = 'Mencoba terhubung ke broker';
             }
             
-            // MQTT connection options
+            // MQTT connection options for HiveMQ Cloud
             const options = {
                 username: 'broker',
                 password: 'Testing123',
@@ -308,7 +247,7 @@
             };
 
             // Connect to MQTT broker
-            const client = mqtt.connect('wss://8aadf3c349f147a5876378e644e14867.s1.eu.hivemq.cloud:8884/mqtt', options);
+            client = mqtt.connect('wss://8aadf3c349f147a5876378e644e14867.s1.eu.hivemq.cloud:8884/mqtt', options);
 
             client.on('connect', function() {
                 console.log('Connected to MQTT broker');
@@ -378,6 +317,7 @@
                             console.log('Rain sensor updated to: Basah');
                             
                             // Disable the bentangkan button when it's raining
+                            const btnBentang = document.getElementById("btn-bentang");
                             if (btnBentang) {
                                 btnBentang.disabled = true;
                                 btnBentang.classList.add('opacity-50', 'cursor-not-allowed');
@@ -391,6 +331,7 @@
                             console.log('Rain sensor updated to: Kering');
                             
                             // Enable the bentangkan button when it's clear
+                            const btnBentang = document.getElementById("btn-bentang");
                             if (btnBentang) {
                                 btnBentang.disabled = false;
                                 btnBentang.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -459,7 +400,7 @@
                 
                 // Attempt to reconnect after 5 seconds
                 setTimeout(() => {
-                    initMqttClient(btnBentang);
+                    initMqttClient();
                 }, 5000);
             });
 
@@ -489,6 +430,73 @@
                     mqttStatusDescription.textContent = 'Mencoba menghubungkan ulang ke broker';
                 }
             });
+        }
+
+        function initControlButtons() {
+            const btnBentang = document.getElementById("btn-bentang");
+            const btnLipat = document.getElementById("btn-lipat");
+            const relValue = document.getElementById("rel-value");
+            const relProgress = document.getElementById("rel-progress");
+
+            // Fungsi bentangkan (set ke 100%)
+            btnBentang.addEventListener("click", () => {
+                if (client && client.connected) {
+                    // Publish directly to MQTT broker
+                    client.publish('jemuran/servo/command', '0'); // 0 for open
+                    relValue.textContent = "Terbuka 100%";
+                    relProgress.style.width = "100%";
+                    console.log("Command 'buka' sent directly to MQTT broker");
+                } else {
+                    console.error("MQTT client not connected");
+                    alert("Gagal mengirim perintah - Koneksi MQTT tidak tersedia!");
+                }
+            });
+
+            // Fungsi lipat (set ke 0%)
+            btnLipat.addEventListener("click", () => {
+                if (client && client.connected) {
+                    // Publish directly to MQTT broker
+                    client.publish('jemuran/servo/command', '1'); // 1 for close
+                    relValue.textContent = "Tertutup 0%";
+                    relProgress.style.width = "0%";
+                    console.log("Command 'tutup' sent directly to MQTT broker");
+                } else {
+                    console.error("MQTT client not connected");
+                    alert("Gagal mengirim perintah - Koneksi MQTT tidak tersedia!");
+                }
+            });
+        }
+
+        function initMap() {
+            // Inisialisasi peta
+            const map = L.map('map').setView([-6.914744, 107.609810], 13); // default Bandung
+
+            // Tambahkan tile layer dari OSM
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Marker default
+            const marker = L.marker([-6.914744, 107.609810]).addTo(map)
+                .bindPopup("Lokasi awal (Bandung)").openPopup();
+
+            // Update sesuai lokasi user
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const {
+                            latitude,
+                            longitude
+                        } = pos.coords;
+                        map.setView([latitude, longitude], 15);
+                        marker.setLatLng([latitude, longitude])
+                            .bindPopup("📍 Lokasi Anda").openPopup();
+                    },
+                    () => {
+                        console.warn("Izin lokasi ditolak, gunakan default Bandung");
+                    }
+                );
+            }
         }
     </script>
 </body>

@@ -6,11 +6,9 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\JemuranController;
 
-// Wrap the jemuran routes in the web middleware group to ensure CSRF protection
-Route::middleware('web')->group(function () {
-    Route::post('/jemuran/buka', [JemuranController::class, 'buka'])->name('jemuran.buka');
-    Route::post('/jemuran/tutup', [JemuranController::class, 'tutup'])->name('jemuran.tutup');
-});
+// Deprecated routes - commands are now sent directly to MQTT from the dashboard
+Route::post('/jemuran/buka', [JemuranController::class, 'buka'])->name('jemuran.buka');
+Route::post('/jemuran/tutup', [JemuranController::class, 'tutup'])->name('jemuran.tutup');
 
 Route::get('/weather/{city}', [WeatherController::class, 'getWeather']);
 
