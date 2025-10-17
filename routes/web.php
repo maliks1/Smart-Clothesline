@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\WeatherController;
+use App\Http\Controllers\JemuranController;
+
+Route::post('/jemuran/buka', [JemuranController::class, 'buka'])->name('jemuran.buka');
+Route::post('/jemuran/tutup', [JemuranController::class, 'tutup'])->name('jemuran.tutup');
 
 Route::get('/weather/{city}', [WeatherController::class, 'getWeather']);
 

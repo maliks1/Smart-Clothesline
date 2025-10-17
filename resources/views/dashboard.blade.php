@@ -132,7 +132,7 @@
                             <button id="btn-lipat"
                                 class="border border-gray-300 rounded-lg p-4 flex flex-col items-center hover:bg-gray-50 transition-colors">
                                 <span class="text-2xl mb-2">⬍</span>
-                                <span class="text-sm">Lipat/Tarik</span>
+                                <span class="text-sm">Lipat</span>
                             </button>
                         </div>
                         <div class="px-6 py-4 border-b border-gray-200 mt-16">
@@ -201,41 +201,41 @@
             const btnLipat = document.getElementById("btn-lipat");
             const relValue = document.getElementById("rel-value");
             const relProgress = document.getElementById("rel-progress");
-            const switches = document.querySelectorAll("input[type='checkbox']");
-
-            // Fungsi nyalakan semua
-            btnOn.addEventListener("click", () => {
-                switches.forEach(sw => sw.checked = true);
-                relValue.textContent = "Terbuka 100%";
-                relProgress.style.width = "100%";
-                alert("✅ Semua fungsi dinyalakan");
-            });
-
-            // Fungsi reset semua
-            btnReset.addEventListener("click", () => {
-                switches.forEach(sw => sw.checked = false);
-                relValue.textContent = "Tertutup 0%";
-                relProgress.style.width = "0%";
-                alert("🔄 Semua fungsi direset");
-            });
 
             // Fungsi bentangkan (set ke 100%)
+            // Fungsi helper POST
+            function sendCommand(url) {
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({})
+                }).then(res => {
+                    if (!res.ok) throw new Error("Gagal kirim command");
+                    return res.text();
+                }).then(() => {
+                    console.log("Command terkirim ke " + url);
+                }).catch(err => {
+                    console.error(err);
+                    alert("Gagal kirim perintah ke server!");
+                });
+            }
+
             btnBentang.addEventListener("click", () => {
                 relValue.textContent = "Terbuka 100%";
                 relProgress.style.width = "100%";
-                alert("⬌ Jemuran dibentangkan");
+                sendCommand("{{ route('jemuran.buka') }}");
             });
 
-            // Fungsi lipat/tarik (set ke 0%)
             btnLipat.addEventListener("click", () => {
                 relValue.textContent = "Tertutup 0%";
                 relProgress.style.width = "0%";
-                alert("⬍ Jemuran ditarik / dilipat");
+                sendCommand("{{ route('jemuran.tutup') }}");
             });
-
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             // Inisialisasi peta
